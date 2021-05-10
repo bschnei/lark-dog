@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+
+  gateway:
+    build: swag/.
+    container_name: swag
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: UTC
+      URL: $DOMAIN
+      VALIDATION: http
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - swag-data:/config
+
+volumes:
+  swag-data:
+    driver: local
