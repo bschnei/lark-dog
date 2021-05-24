@@ -1,25 +1,76 @@
-version: "3"
+version: '3'
+
+networks:
+  frontend:
+  backend:
 
 services:
 
+  photoprism:
+    image: photoprism/photoprism:latest
+    container_name: photoprism
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+      - apparmor:unconfined
+    environment:
+      PHOTOPRISM_ADMIN_PASSWORD:
+      PHOTOPRISM_DISABLE_SETTINGS: "true"
+      PHOTOPRISM_PUBLIC: "true"
+      PHOTOPRISM_DATABASE_DRIVER: mysql
+      PHOTOPRISM_DATABASE_SERVER: mariadb
+      PHOTOPRISM_DATABASE_PASSWORD: $MARIADB_PASSWORD
+      PHOTOPRISM_SITE_URL: "https://${DOMAIN}/"
+      PHOTOPRISM_SITE_TITLE: "Larky"
+    user: "1000:1001"
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - "~/originals:/photoprism/originals"
+      - "~/storage:/photoprism/storage"
+
+  mariadb:
+    image: mariadb:10.5
+    container_name: mariadb
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    command: mysqld --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=50
+    networks:
+      - backend
+    environment:
+      MARIADB_ROOT_PASSWORD:
+      MARIADB_DATABASE: photoprism
+      MARIADB_USER: photoprism
+      MARIADB_PASSWORD:
+    volumes:
+      - mariadb:/var/lib/mysql
+
   gateway:
-    build: swag/.
+    image: gcr.io/${GCP_PROJECT_ID}/swag
     container_name: swag
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
     environment:
       PUID: 1000
-      PGID: 1000
+      PGID: 1001
       TZ: UTC
       URL: $DOMAIN
       VALIDATION: http
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      - frontend
     volumes:
       - swag-data:/config
 
 volumes:
+  mariadb:
+    driver: local
   swag-data:
     driver: local
