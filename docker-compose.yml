@@ -29,6 +29,7 @@ services:
       - frontend
       - backend
     volumes:
+      - "~/import:/photoprism/import"
       - "~/originals:/photoprism/originals"
       - "~/storage:/photoprism/storage"
 

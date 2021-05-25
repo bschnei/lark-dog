@@ -66,17 +66,21 @@ push:
 	docker tag $(LOCAL_SWAG_TAG) $(REMOTE_SWAG_TAG)
 	docker push $(REMOTE_SWAG_TAG)
 
+# this only needs to be run one time on a new instance
+config:
+	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker'
+	-$(MAKE) ssh-cmd CMD='mkdir import'
+	-$(MAKE) ssh-cmd CMD='mkdir originals'
+	-$(MAKE) ssh-cmd CMD='mkdir storage'
+
 deploy:
 	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~ \
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE)
-	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker'
 	$(MAKE) ssh-cmd CMD='\
 		DOMAIN=$(DOMAIN) \
 		GCP_PROJECT_ID=$(GCP_PROJECT_ID) \
 		docker-compose pull'
-	-$(MAKE) ssh-cmd CMD='mkdir originals'
-	-$(MAKE) ssh-cmd CMD='mkdir storage'
 	@$(MAKE) ssh-cmd CMD='\
 		DOMAIN=$(DOMAIN) \
 		GCP_PROJECT_ID=$(GCP_PROJECT_ID) \
