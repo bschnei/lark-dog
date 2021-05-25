@@ -49,7 +49,7 @@ resource "google_compute_instance" "web_server" {
   }
 
   # f1-micro is the smallest/cheapest instance gcp offers
-  machine_type = "e2-medium"
+  machine_type = "e2-small"
 
   # this is a static hostname within the VPC
   # changing it requires a complete rebuild of the instance!

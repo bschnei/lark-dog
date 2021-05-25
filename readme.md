@@ -1,4 +1,4 @@
-This project sets up a GCP instance running [Photoprism](https://github.com/photoprism/photoprism) using terraform and docker-compose. HTTPS support is provided by a container running [SWAG](https://github.com/linuxserver/docker-swag).
+This project sets up a GCP instance running [Photoprism](https://github.com/photoprism/photoprism) using terraform and docker-compose. HTTPS support is provided with a modified [SWAG](https://github.com/linuxserver/docker-swag) image.
 
 This is an experiment to see how Photoprism does as a public-facing website. The project does not currently have great support for enabling/disabling certain features piecemeal which makes it a bit awkward to use in this fashion. Specifically, I would like the ability to have most of the site be read-only, except to an admin. Currently, it's a bit of an all-or-nothing approach, but I can get close by messing around with the settings to hide a lot of the options that would give a user the ability to modify data. Using the built-in "read only" mode seemed like it would be a good solution but doing so turns off the built-in WebDAV server even though the server requires a login to use.
 
