@@ -72,6 +72,9 @@ config:
 	-$(MAKE) ssh-cmd CMD='mkdir import'
 	-$(MAKE) ssh-cmd CMD='mkdir originals'
 	-$(MAKE) ssh-cmd CMD='mkdir storage'
+	gcloud compute scp settings.yml $(GCP_INSTANCE_NAME):~\storage\config \
+		--project=$(GCP_PROJECT_ID) \
+		--zone=$(GCP_ZONE)
 
 deploy:
 	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~ \

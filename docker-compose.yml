@@ -24,6 +24,8 @@ services:
       PHOTOPRISM_DATABASE_PASSWORD: $MARIADB_PASSWORD
       PHOTOPRISM_SITE_URL: "https://${DOMAIN}/"
       PHOTOPRISM_SITE_TITLE: "Larky"
+      PHOTOPRISM_SITE_CAPTION: ""
+      PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
     user: "1000:1001"
     networks:
       - frontend
