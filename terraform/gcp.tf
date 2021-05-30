@@ -18,6 +18,23 @@ data "google_compute_network" "default" {
   name = "default"
 }
 
+# SLEEP SCHEDULE
+resource "google_compute_resource_policy" "sleep_nightly" {
+  name = "sleep-nightly"
+
+  instance_schedule_policy {
+    time_zone = "America/Los_Angeles"
+    
+    vm_start_schedule {
+      schedule = "0 8 * * *"
+    }
+
+    vm_stop_schedule {
+      schedule = "0 22 * * *"
+    }
+  }
+}
+
 # FIREWALL RULES
 resource "google_compute_firewall" "allow_web" {
   name    = "allow-web"
@@ -43,12 +60,14 @@ data "google_compute_image" "boot_image" {
 resource "google_compute_instance" "web_server" {
 
   boot_disk {
+    auto_delete = false
     initialize_params {
       image = data.google_compute_image.boot_image.self_link
     }
   }
 
-  # f1-micro is the smallest/cheapest instance gcp offers
+  # e2-small seems to have more compute than needed but a good
+  # amount of memory
   machine_type = "e2-small"
 
   # this is a static hostname within the VPC
@@ -75,4 +94,7 @@ resource "google_compute_instance" "web_server" {
   metadata = {
     user-data = file("cloud-init.conf")
   }
+
+  resource_policies = [google_compute_resource_policy.sleep_nightly.self_link]
+
 }
