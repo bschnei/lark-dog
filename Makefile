@@ -70,8 +70,7 @@ push:
 config:
 	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker'
 	-$(MAKE) ssh-cmd CMD='mkdir import'
-	-$(MAKE) ssh-cmd CMD='mkdir originals'
-	-$(MAKE) ssh-cmd CMD='mkdir storage'
+	-$(MAKE) ssh-cmd CMD='mkdir -p ~\storage\config'
 	gcloud compute scp settings.yml $(GCP_INSTANCE_NAME):~\storage\config \
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE)

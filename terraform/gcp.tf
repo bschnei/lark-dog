@@ -1,8 +1,8 @@
 provider "google" {
 
   # default project and region to apply to resources
-  project     = var.gcp_project_id
-  region      = "us-central1"
+  project = var.gcp_project_id
+  region  = "us-central1"
 
   credentials = file("terraform-sa-key.json")
 
@@ -24,7 +24,7 @@ resource "google_compute_resource_policy" "sleep_nightly" {
 
   instance_schedule_policy {
     time_zone = "America/Los_Angeles"
-    
+
     vm_start_schedule {
       schedule = "0 8 * * *"
     }
@@ -50,20 +50,33 @@ resource "google_compute_firewall" "allow_web" {
   target_tags = ["allow-web"]
 }
 
-# OS IMAGE
+# base system image
+# note: GCP monitoring agent not availble yet for ubuntu-2104
+# see: https://cloud.google.com/monitoring/agent/monitoring#supported_operating_systems
 data "google_compute_image" "boot_image" {
-  family  = "ubuntu-minimal-2104"
+  family  = "ubuntu-minimal-2010"
   project = "ubuntu-os-cloud"
+}
+
+# persistent storage for photo data
+resource "google_compute_disk" "photos" {
+  name = "photos"
+  size = 10
+  type = "pd-standard"
 }
 
 # web server instance
 resource "google_compute_instance" "web_server" {
 
   boot_disk {
-    auto_delete = false
+    device_name = "ubuntu"
     initialize_params {
       image = data.google_compute_image.boot_image.self_link
     }
+  }
+
+  attached_disk {
+    source = google_compute_disk.photos.self_link
   }
 
   # e2-small seems to have more compute than needed but a good
@@ -72,9 +85,9 @@ resource "google_compute_instance" "web_server" {
 
   # this is a static hostname within the VPC
   # changing it requires a complete rebuild of the instance!
-  name         = var.gcp_instance_name
+  name = var.gcp_instance_name
 
-  zone         = "us-central1-a"
+  zone = "us-central1-a"
 
   # required. specifies the VPC
   network_interface {
@@ -92,7 +105,8 @@ resource "google_compute_instance" "web_server" {
   }
 
   metadata = {
-    user-data = file("cloud-init.conf")
+    startup-script = file("startup.sh")
+    user-data      = file("cloud-init.conf")
   }
 
   resource_policies = [google_compute_resource_policy.sleep_nightly.self_link]
