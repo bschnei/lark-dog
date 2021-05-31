@@ -63,20 +63,22 @@ resource "google_compute_disk" "photos" {
   name = "photos"
   size = 10
   type = "pd-standard"
+  zone = "us-central1-a"
 }
 
 # web server instance
 resource "google_compute_instance" "web_server" {
 
   boot_disk {
-    device_name = "ubuntu"
     initialize_params {
+      type  = "pd-balanced"
       image = data.google_compute_image.boot_image.self_link
     }
   }
 
   attached_disk {
-    source = google_compute_disk.photos.self_link
+    device_name = google_compute_disk.photos.name
+    source      = google_compute_disk.photos.self_link
   }
 
   # e2-small seems to have more compute than needed but a good
@@ -101,7 +103,7 @@ resource "google_compute_instance" "web_server" {
   tags = google_compute_firewall.allow_web.target_tags
 
   service_account {
-    scopes = ["storage-ro"]
+    scopes = ["monitoring-write", "storage-ro"]
   }
 
   metadata = {
