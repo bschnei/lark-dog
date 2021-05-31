@@ -68,6 +68,7 @@ push:
 
 # this only needs to be run one time on a new instance
 config:
+	$(MAKE) ssh-cmd CMD='curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh && sudo bash add-monitoring-agent-repo.sh --also-install && sudo service stackdriver-agent start'
 	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker'
 	-$(MAKE) ssh-cmd CMD='mkdir import'
 	-$(MAKE) ssh-cmd CMD='mkdir -p ~/storage/config'
