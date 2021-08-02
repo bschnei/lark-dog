@@ -54,7 +54,7 @@ resource "google_compute_firewall" "allow_web" {
 # note: GCP monitoring agent not availble yet for ubuntu-2104
 # see: https://cloud.google.com/monitoring/agent/monitoring#supported_operating_systems
 data "google_compute_image" "boot_image" {
-  family  = "ubuntu-minimal-2010"
+  family  = "ubuntu-minimal-2104"
   project = "ubuntu-os-cloud"
 }
 
@@ -83,7 +83,7 @@ resource "google_compute_instance" "web_server" {
 
   # e2-small seems to have more compute than needed but a good
   # amount of memory
-  machine_type = "e2-small"
+  machine_type = "e2-micro"
 
   # this is a static hostname within the VPC
   # changing it requires a complete rebuild of the instance!
@@ -103,7 +103,7 @@ resource "google_compute_instance" "web_server" {
   tags = google_compute_firewall.allow_web.target_tags
 
   service_account {
-    scopes = ["monitoring-write", "storage-ro"]
+    scopes = ["storage-ro"]
   }
 
   metadata = {
