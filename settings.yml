@@ -11,7 +11,7 @@ Maps:
 Features:
   Upload: false
   Download: true
-  Private: false 
+  Private: false
   Review: false
   Files: true
   Videos: true
@@ -19,7 +19,7 @@ Features:
   Albums: false
   Moments: false
   Estimates: true
-  People: true
+  People: false
   Labels: false
   Places: true
   Edit: false
