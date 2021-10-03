@@ -1,7 +1,8 @@
 DOMAIN=lark.dog
 
 GCP_PROJECT_ID=lark-dog
-GCP_ZONE=us-central1-a
+GCP_REGION=us-west1
+GCP_ZONE=$(GCP_REGION)-b
 GCP_INSTANCE_NAME=web-server
 
 run-local:
@@ -26,6 +27,8 @@ terraform-action:
 	@cd terraform && \
 		terraform $(TF_ACTION) \
 		-var="gcp_project_id=$(GCP_PROJECT_ID)" \
+		-var="gcp_region=$(GCP_REGION)" \
+		-var="gcp_zone=$(GCP_ZONE)" \
 		-var="gcp_instance_name=$(GCP_INSTANCE_NAME)" \
 		-var="namecheap_username=$(call get-secret,namecheap_username)" \
 		-var="namecheap_token=$(call get-secret,namecheap_token)" \
@@ -34,11 +37,6 @@ terraform-action:
 ###
 
 SSH_STRING=ben@$(GCP_INSTANCE_NAME)
-
-sleep:
-	gcloud compute instances stop $(GCP_INSTANCE_NAME) \
-		--project=$(GCP_PROJECT_ID) \
-		--zone=$(GCP_ZONE)
 
 ssh:
 	gcloud compute ssh $(SSH_STRING) \
@@ -50,11 +48,6 @@ ssh-cmd:
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE) \
 		--command="$(CMD)"
-
-wake:
-	gcloud compute instances start $(GCP_INSTANCE_NAME) \
-		--project=$(GCP_PROJECT_ID) \
-		--zone=$(GCP_ZONE)
 
 LOCAL_SWAG_TAG=swag:latest
 REMOTE_SWAG_TAG=gcr.io/$(GCP_PROJECT_ID)/$(LOCAL_SWAG_TAG)
@@ -68,7 +61,6 @@ push:
 
 # this only needs to be run one time on a new instance
 config:
-#	$(MAKE) ssh-cmd CMD='curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh && sudo bash add-monitoring-agent-repo.sh --also-install && sudo service stackdriver-agent start'
 	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker'
 	-$(MAKE) ssh-cmd CMD='mkdir import'
 	-$(MAKE) ssh-cmd CMD='mkdir -p ~/storage/config'
