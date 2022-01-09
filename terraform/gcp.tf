@@ -52,7 +52,7 @@ resource "google_compute_firewall" "allow_web" {
 
 # base system image
 data "google_compute_image" "boot_image" {
-  family  = "ubuntu-minimal-2104"
+  family  = "ubuntu-minimal-2110"
   project = "ubuntu-os-cloud"
 }
 
