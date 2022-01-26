@@ -5,10 +5,6 @@ GCP_REGION=us-west1
 GCP_ZONE=$(GCP_REGION)-b
 GCP_INSTANCE_NAME=web-server
 
-run-local:
-	docker-compose -f docker-compose.local.yml up
-
-###
 
 define get-secret
 $(shell gcloud secrets versions access latest --secret=$(1) --project=$(GCP_PROJECT_ID))
