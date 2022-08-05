@@ -5,8 +5,8 @@ terraform {
       version = "~> 4.0"
     }
     namecheap = {
-      source  = "robgmills/namecheap"
-      version = "~> 1.7.0"
+      source  = "namecheap/namecheap"
+      version = "~> 2.0"
     }
   }
 }

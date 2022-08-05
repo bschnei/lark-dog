@@ -1,23 +1,27 @@
 provider "namecheap" {
-  username    = var.namecheap_username
+  user_name   = var.namecheap_username
   api_user    = var.namecheap_username
-  token       = var.namecheap_token
-  ip          = var.namecheap_ip
+  api_key     = var.namecheap_token
+  client_ip   = var.namecheap_ip
   use_sandbox = false
 }
 
-# ipv4 address record
-resource "namecheap_record" "ipv4_record" {
-  name    = "@"
-  domain  = var.namecheap_domain
-  address = google_compute_address.ipv4.address
-  type    = "A"
-}
+resource "namecheap_domain_records" "lark-dog" {
+  domain = var.namecheap_domain
+  mode   = "OVERWRITE"
 
-# Certification Authority Authorization record
-resource "namecheap_record" "caa_record" {
-  name    = "@"
-  domain  = var.namecheap_domain
-  address = "0 issue \"letsencrypt.org\""
-  type    = "CAA"
+  record {
+    hostname = "@"
+    type     = "A"
+    address  = google_compute_address.ipv4.address
+  }
+
+  # Certification Authority Authorization record
+  record {
+    hostname = "@"
+    type     = "CAA"
+    address  = "0 issue \"letsencrypt.org\""
+  }
+
+
 }
