@@ -8,7 +8,7 @@ networks:
 services:
 
   photoprism:
-    image: photoprism/photoprism:latest
+    image: photoprism/photoprism:220617-bookworm
     container_name: photoprism
     restart: unless-stopped
     security_opt:
@@ -19,13 +19,13 @@ services:
       PHOTOPRISM_ADMIN_PASSWORD:
       PHOTOPRISM_DISABLE_SETTINGS: "true"
       PHOTOPRISM_DISABLE_TENSORFLOW: "true"
-      PHOTOPRISM_AUTH_MODE: "public"
+      PHOTOPRISM_PUBLIC: "true"
       PHOTOPRISM_DATABASE_DRIVER: mysql
       PHOTOPRISM_DATABASE_SERVER: mariadb
       PHOTOPRISM_DATABASE_PASSWORD: $MARIADB_PASSWORD
       PHOTOPRISM_SITE_URL: "https://${DOMAIN}/"
-      PHOTOPRISM_SITE_TITLE: "Larky"
-      PHOTOPRISM_SITE_CAPTION: ""
+      PHOTOPRISM_SITE_DESCRIPTION: "It's a website. For a dog."
+      PHOTOPRISM_SITE_CAPTION: "Larky"
       PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
     user: "1000:1001"
     networks:
@@ -37,16 +37,17 @@ services:
       - "~/storage:/photoprism/storage"
 
   mariadb:
-    image: mariadb:10.5
+    image: mariadb:10.8
     container_name: mariadb
     restart: unless-stopped
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
-    command: mysqld --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=50
+    command: mysqld --innodb-buffer-pool-size=512M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
     networks:
       - backend
     environment:
+      MARIADB_AUTO_UPGRADE: "1"
       MARIADB_ROOT_PASSWORD:
       MARIADB_DATABASE: photoprism
       MARIADB_USER: photoprism
