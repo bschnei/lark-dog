@@ -8,7 +8,13 @@ provider "google" {
 
 }
 
-# IP ADDRESS
+# repo for docker images
+resource "google_artifact_registry_repository" "docker" {
+  repository_id = var.gcp_artifact_repo_id
+  format        = "DOCKER"
+}
+
+# static ipv4 address
 resource "google_compute_address" "ipv4" {
   name = "${var.gcp_instance_name}-ip"
 }

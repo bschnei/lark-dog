@@ -15,6 +15,10 @@ variable "gcp_instance_name" {
   type = string
 }
 
+variable "gcp_artifact_repo_id" {
+  type = string
+}
+
 ### NAMECHEAP
 variable "namecheap_username" {
   type = string
