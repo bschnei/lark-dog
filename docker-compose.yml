@@ -8,7 +8,7 @@ networks:
 services:
 
   photoprism:
-    image: gcr.io/${GCP_PROJECT_ID}/photoprism
+    image: ${GCP_REPO_PATH}/photoprism
     container_name: photoprism
     restart: unless-stopped
     security_opt:
@@ -56,7 +56,7 @@ services:
       - mariadb:/var/lib/mysql
 
   gateway:
-    image: gcr.io/${GCP_PROJECT_ID}/swag
+    image: ${GCP_REPO_PATH}/swag
     container_name: swag
     restart: unless-stopped
     cap_add:
