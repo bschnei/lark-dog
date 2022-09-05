@@ -32,7 +32,8 @@ terraform-action:
 		-var="gcp_artifact_repo_id=$(GCP_ARTIFACT_REPO_ID)" \
 		-var="namecheap_username=$(call get-secret,namecheap_username)" \
 		-var="namecheap_token=$(call get-secret,namecheap_token)" \
-		-var="namecheap_ip=$(call get-ipv4)"
+		-var="namecheap_ip=$(call get-ipv4)" \
+		-var="namecheap_domain=$(DOMAIN)"
 
 ###
 
