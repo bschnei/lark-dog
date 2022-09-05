@@ -47,13 +47,28 @@ ssh-cmd:
 
 LOCAL_SWAG_TAG=swag:latest
 REMOTE_SWAG_TAG=gcr.io/$(GCP_PROJECT_ID)/$(LOCAL_SWAG_TAG)
+REMOTE_PHOTOPRISM_TAG=gcr.io/$(GCP_PROJECT_ID)/photoprism:latest
 
-build:
+build: build-swag build-photoprism
+
+build-swag:
 	docker build -t $(LOCAL_SWAG_TAG) ./swag
 
-push:
+build-photoprism:
+	rm -rf build
+	git clone --branch release --depth 1 git@github.com:photoprism/photoprism.git build
+	git apply --directory=build photoprism/webdav.patch
+	$(MAKE) -C build docker-local
+
+push: push-swag push-photoprism
+
+push-swag:
 	docker tag $(LOCAL_SWAG_TAG) $(REMOTE_SWAG_TAG)
 	docker push $(REMOTE_SWAG_TAG)
+
+push-photoprism:
+	docker tag photoprism/photoprism:local $(REMOTE_PHOTOPRISM_TAG)
+	docker push $(REMOTE_PHOTOPRISM_TAG)
 
 # this only needs to be run one time on a new instance
 config:
@@ -63,6 +78,12 @@ config:
 	gcloud compute scp settings.yml $(GCP_INSTANCE_NAME):~/storage/config \
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE)
+
+docker-down:
+	$(MAKE) ssh-cmd CMD='\
+		DOMAIN=$(DOMAIN) \
+		GCP_PROJECT_ID=$(GCP_PROJECT_ID) \
+		docker-compose down'
 
 deploy:
 	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~ \

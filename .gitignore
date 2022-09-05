@@ -1,3 +1,4 @@
+build
 *key.json
 .terraform
 terraform.tfstate.backup

@@ -8,7 +8,7 @@ networks:
 services:
 
   photoprism:
-    image: photoprism/photoprism:220617-bookworm
+    image: gcr.io/${GCP_PROJECT_ID}/photoprism
     container_name: photoprism
     restart: unless-stopped
     security_opt:
