@@ -83,7 +83,7 @@ config:
 	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker $(GCP_REPO_SERVER)'
 	-$(MAKE) ssh-cmd CMD='mkdir import'
 	-$(MAKE) ssh-cmd CMD='mkdir -p ~/storage/config'
-	gcloud compute scp settings.yml $(GCP_INSTANCE_NAME):~/storage/config \
+	gcloud compute scp photoprism/settings.yml $(GCP_INSTANCE_NAME):~/storage/config \
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE)
 
