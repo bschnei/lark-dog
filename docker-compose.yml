@@ -25,8 +25,11 @@ services:
       PHOTOPRISM_DATABASE_PASSWORD: $MARIADB_PASSWORD
       PHOTOPRISM_SITE_URL: "https://${DOMAIN}/"
       PHOTOPRISM_SITE_DESCRIPTION: "It's a website. For a dog."
-      PHOTOPRISM_SITE_CAPTION: "Larky"
+      PHOTOPRISM_SITE_CAPTION: "no, she's a border collie. yes, 100%"
       PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
+      PHOTOPRISM_SPONSOR: "true"
+      PHOTOPRISM_IMPRINT: "Photos Copyright Kelly Gipson"
+      PHOTOPRISM_SITE_TITLE: "Larky"
     user: "1000:1000"
     networks:
       - frontend

@@ -69,13 +69,6 @@ push:
 config-server:
 	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker $(GCP_REPO_SERVER)'
 
-docker-down:
-	$(MAKE) ssh-cmd CMD='\
-		cd $(GCP_PROJECT_ID) && \
-		DOMAIN=$(DOMAIN) \
-		GCP_REPO_PATH=$(GCP_REPO_PATH) \
-		sudo -E docker-compose down'
-
 update-config:
 	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~/$(GCP_PROJECT_ID) \
 		--project=$(GCP_PROJECT_ID) \
@@ -102,3 +95,10 @@ deploy: update-config
 		MARIADB_PASSWORD=$(call get-secret,mariadb_password) \
 		sudo -E docker-compose up -d'
 	$(MAKE) ssh-cmd CMD='sudo docker system prune -a -f'
+
+docker-down:
+	$(MAKE) ssh-cmd CMD='\
+		cd $(GCP_PROJECT_ID) && \
+		DOMAIN=$(DOMAIN) \
+		GCP_REPO_PATH=$(GCP_REPO_PATH) \
+		sudo -E docker-compose down'
