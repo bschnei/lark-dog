@@ -100,3 +100,7 @@ docker-down:
 		DOMAIN=$(DOMAIN) \
 		GCP_REPO_PATH=$(GCP_REPO_PATH) \
 		sudo -E docker-compose down'
+
+photoprism-index:
+	$(MAKE) ssh-cmd CMD='\
+		sudo docker exec -d photoprism photoprism index'
