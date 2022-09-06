@@ -11,6 +11,8 @@ services:
     image: ${GCP_REPO_PATH}/photoprism
     container_name: photoprism
     restart: unless-stopped
+    depends_on:
+      - mariadb
     security_opt:
       - no-new-privileges:true
       - seccomp:unconfined
@@ -22,10 +24,10 @@ services:
       PHOTOPRISM_AUTH_MODE: "public"
       PHOTOPRISM_DATABASE_DRIVER: mysql
       PHOTOPRISM_DATABASE_SERVER: mariadb
-      PHOTOPRISM_DATABASE_PASSWORD: $MARIADB_PASSWORD
+      PHOTOPRISM_DATABASE_PASSWORD: photoprism
       PHOTOPRISM_SITE_URL: "https://${DOMAIN}/"
       PHOTOPRISM_SITE_DESCRIPTION: "It's a website. For a dog."
-      PHOTOPRISM_SITE_CAPTION: "no, she's a border collie. yes, 100%"
+      PHOTOPRISM_SITE_CAPTION: "Larky"
       PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
       PHOTOPRISM_SPONSOR: "true"
       PHOTOPRISM_IMPRINT: "Photos Copyright Kelly Gipson"
@@ -51,10 +53,11 @@ services:
       - backend
     environment:
       MARIADB_AUTO_UPGRADE: "1"
-      MARIADB_ROOT_PASSWORD:
+      MARIADB_INITDB_SKIP_TZINFO: "1"
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
       MARIADB_DATABASE: photoprism
       MARIADB_USER: photoprism
-      MARIADB_PASSWORD:
+      MARIADB_PASSWORD: photoprism
     volumes:
       - "~/data/mariadb:/var/lib/mysql"
 

@@ -91,8 +91,6 @@ deploy: update-config
 		DOMAIN=$(DOMAIN) \
 		GCP_REPO_PATH=$(GCP_REPO_PATH) \
 		PHOTOPRISM_ADMIN_PASSWORD=$(call get-secret,photoprism_admin_password) \
-		MARIADB_ROOT_PASSWORD=$(call get-secret,mariadb_root_password) \
-		MARIADB_PASSWORD=$(call get-secret,mariadb_password) \
 		sudo -E docker-compose up -d'
 	$(MAKE) ssh-cmd CMD='sudo docker system prune -a -f'
 
