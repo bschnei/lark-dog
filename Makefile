@@ -80,19 +80,22 @@ update-config:
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE)
 
-deploy: update-config
+deploy: update-config docker-pull docker-up docker-prune
+
+docker-pull:
 	$(MAKE) ssh-cmd CMD='\
 		cd $(GCP_PROJECT_ID) && \
 		DOMAIN=$(DOMAIN) \
 		GCP_REPO_PATH=$(GCP_REPO_PATH) \
 		sudo -E docker-compose pull'
+
+docker-up:
 	@$(MAKE) ssh-cmd CMD='\
 		cd $(GCP_PROJECT_ID) && \
 		DOMAIN=$(DOMAIN) \
 		GCP_REPO_PATH=$(GCP_REPO_PATH) \
 		PHOTOPRISM_ADMIN_PASSWORD=$(call get-secret,photoprism_admin_password) \
 		sudo -E docker-compose up -d'
-	$(MAKE) ssh-cmd CMD='sudo docker system prune -a -f'
 
 docker-down:
 	$(MAKE) ssh-cmd CMD='\
@@ -100,6 +103,9 @@ docker-down:
 		DOMAIN=$(DOMAIN) \
 		GCP_REPO_PATH=$(GCP_REPO_PATH) \
 		sudo -E docker-compose down'
+
+docker-prune:
+	$(MAKE) ssh-cmd CMD='sudo docker system prune -a -f'
 
 photoprism-index:
 	$(MAKE) ssh-cmd CMD='\
