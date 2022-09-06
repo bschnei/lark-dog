@@ -62,12 +62,11 @@ data "google_compute_image" "boot_image" {
   project = "ubuntu-os-cloud"
 }
 
-# persistent storage for photo data
-resource "google_compute_disk" "photos" {
-  name     = "photos"
-  size     = 10
-  type     = "pd-standard"
-  snapshot = "snapshot-1"
+# persistent storage
+resource "google_compute_disk" "data" {
+  name = "data"
+  size = 10
+  type = "pd-standard"
 }
 
 # web server instance
@@ -81,8 +80,8 @@ resource "google_compute_instance" "web_server" {
   }
 
   attached_disk {
-    device_name = google_compute_disk.photos.name
-    source      = google_compute_disk.photos.self_link
+    device_name = google_compute_disk.data.name
+    source      = google_compute_disk.data.self_link
   }
 
   machine_type = "e2-micro"
@@ -104,8 +103,7 @@ resource "google_compute_instance" "web_server" {
   }
 
   metadata = {
-    startup-script = file("startup.sh")
-    user-data      = file("cloud-init.conf")
+    user-data = file("cloud-init.conf")
   }
 
   resource_policies = [google_compute_resource_policy.sleep_nightly.self_link]

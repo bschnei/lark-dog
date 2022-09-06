@@ -3,7 +3,7 @@ DOMAIN=lark.dog
 GCP_PROJECT_ID=lark-dog
 GCP_REGION=us-west1
 GCP_ZONE=$(GCP_REGION)-b
-GCP_INSTANCE_NAME=web-server
+GCP_INSTANCE_NAME=lark-dog
 GCP_REPO_SERVER=$(GCP_REGION)-docker.pkg.dev
 GCP_ARTIFACT_REPO_ID=docker
 GCP_REPO_PATH=$(GCP_REPO_SERVER)/$(GCP_PROJECT_ID)/$(GCP_ARTIFACT_REPO_ID)
@@ -52,61 +52,53 @@ ssh-cmd:
 
 ###
 
-LOCAL_SWAG_TAG=swag:latest
-REMOTE_SWAG_TAG=$(GCP_REPO_PATH)/$(LOCAL_SWAG_TAG)
-REMOTE_PHOTOPRISM_TAG=$(GCP_REPO_PATH)/photoprism:latest
-
-build: build-swag build-photoprism
-
-build-swag:
-	docker build -t $(LOCAL_SWAG_TAG) ./swag
-
-build-photoprism:
+build:
 	rm -rf build
 	git clone --branch release --depth 1 git@github.com:photoprism/photoprism.git build
 	git apply --directory=build photoprism/webdav.patch
 	$(MAKE) -C build docker-local
 
-push: push-swag push-photoprism
-
-push-swag:
-	docker tag $(LOCAL_SWAG_TAG) $(REMOTE_SWAG_TAG)
-	docker push $(REMOTE_SWAG_TAG)
-
-push-photoprism:
+REMOTE_PHOTOPRISM_TAG=$(GCP_REPO_PATH)/photoprism:latest
+push:
 	docker tag photoprism/photoprism:local $(REMOTE_PHOTOPRISM_TAG)
 	docker push $(REMOTE_PHOTOPRISM_TAG)
 
 ###
 
 # this only needs to be run one time on a new instance
-config:
+config-server:
 	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker $(GCP_REPO_SERVER)'
-	-$(MAKE) ssh-cmd CMD='mkdir import'
-	-$(MAKE) ssh-cmd CMD='mkdir -p ~/storage/config'
-	gcloud compute scp photoprism/settings.yml $(GCP_INSTANCE_NAME):~/storage/config \
-		--project=$(GCP_PROJECT_ID) \
-		--zone=$(GCP_ZONE)
 
 docker-down:
 	$(MAKE) ssh-cmd CMD='\
-		DOMAIN=$(DOMAIN) \
-		GCP_PROJECT_ID=$(GCP_PROJECT_ID) \
-		docker-compose down'
-
-deploy:
-	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~ \
-		--project=$(GCP_PROJECT_ID) \
-		--zone=$(GCP_ZONE)
-	$(MAKE) ssh-cmd CMD='\
+		cd $(GCP_PROJECT_ID) && \
 		DOMAIN=$(DOMAIN) \
 		GCP_REPO_PATH=$(GCP_REPO_PATH) \
-		docker-compose pull'
+		sudo -E docker-compose down'
+
+update-config:
+	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~/$(GCP_PROJECT_ID) \
+		--project=$(GCP_PROJECT_ID) \
+		--zone=$(GCP_ZONE)
+	gcloud compute scp swag/lark-dog.conf $(GCP_INSTANCE_NAME):~/data/swag/nginx/site-confs \
+		--project=$(GCP_PROJECT_ID) \
+		--zone=$(GCP_ZONE)
+	gcloud compute scp photoprism/settings.yml $(GCP_INSTANCE_NAME):~/data/photoprism/storage/config \
+		--project=$(GCP_PROJECT_ID) \
+		--zone=$(GCP_ZONE)
+
+deploy: update-config
+	$(MAKE) ssh-cmd CMD='\
+		cd $(GCP_PROJECT_ID) && \
+		DOMAIN=$(DOMAIN) \
+		GCP_REPO_PATH=$(GCP_REPO_PATH) \
+		sudo -E docker-compose pull'
 	@$(MAKE) ssh-cmd CMD='\
+		cd $(GCP_PROJECT_ID) && \
 		DOMAIN=$(DOMAIN) \
 		GCP_REPO_PATH=$(GCP_REPO_PATH) \
 		PHOTOPRISM_ADMIN_PASSWORD=$(call get-secret,photoprism_admin_password) \
 		MARIADB_ROOT_PASSWORD=$(call get-secret,mariadb_root_password) \
 		MARIADB_PASSWORD=$(call get-secret,mariadb_password) \
-		docker-compose up -d'
-	$(MAKE) ssh-cmd CMD='docker system prune -a -f'
+		sudo -E docker-compose up -d'
+	$(MAKE) ssh-cmd CMD='sudo docker system prune -a -f'

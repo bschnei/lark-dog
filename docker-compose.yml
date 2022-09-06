@@ -27,17 +27,17 @@ services:
       PHOTOPRISM_SITE_DESCRIPTION: "It's a website. For a dog."
       PHOTOPRISM_SITE_CAPTION: "Larky"
       PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
-    user: "1000:1001"
+    user: "1000:1000"
     networks:
       - frontend
       - backend
     volumes:
-      - "~/import:/photoprism/import"
-      - "~/originals:/photoprism/originals"
-      - "~/storage:/photoprism/storage"
+      - photoprism-import:/photoprism/import
+      - "~/data/photoprism/originals:/photoprism/originals"
+      - "~/data/photoprism/storage:/photoprism/storage"
 
   mariadb:
-    image: mariadb:10.8
+    image: mariadb:10.9
     container_name: mariadb
     restart: unless-stopped
     security_opt:
@@ -53,18 +53,18 @@ services:
       MARIADB_USER: photoprism
       MARIADB_PASSWORD:
     volumes:
-      - mariadb:/var/lib/mysql
+      - "~/data/mariadb:/var/lib/mysql"
 
   gateway:
-    image: ${GCP_REPO_PATH}/swag
+    image: lscr.io/linuxserver/swag
     container_name: swag
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
     environment:
       PUID: 1000
-      PGID: 1001
-      TZ: UTC
+      PGID: 1000
+      TZ: America/Los_Angeles
       URL: $DOMAIN
       VALIDATION: http
     ports:
@@ -73,10 +73,7 @@ services:
     networks:
       - frontend
     volumes:
-      - swag-data:/config
+      - "~/data/swag:/config"
 
 volumes:
-  mariadb:
-    driver: local
-  swag-data:
-    driver: local
+  photoprism-import:
