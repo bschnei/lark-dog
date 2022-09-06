@@ -7,8 +7,9 @@ provider "namecheap" {
 }
 
 resource "namecheap_domain_records" "lark-dog" {
-  domain = var.namecheap_domain
-  mode   = "OVERWRITE"
+  domain     = var.namecheap_domain
+  mode       = "OVERWRITE"
+  email_type = "FWD"
 
   record {
     hostname = "@"

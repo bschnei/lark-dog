@@ -30,7 +30,8 @@ services:
       PHOTOPRISM_SITE_CAPTION: "Larky"
       PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
       PHOTOPRISM_SPONSOR: "true"
-      PHOTOPRISM_IMPRINT: "Photos Copyright Kelly Gipson"
+      PHOTOPRISM_IMPRINT: "Photos Copyright Kelly G"
+      PHOTOPRISM_IMPRINT_URI: "admin@lark.dog"
       PHOTOPRISM_SITE_TITLE: "Larky"
     user: "1000:1000"
     networks:
