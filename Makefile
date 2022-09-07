@@ -66,6 +66,8 @@ push:
 ###
 
 # this only needs to be run one time on a new instance
+# TODO: see if this can be migrated to cloud-init.conf
+# sudo -u ben gcloud --quiet auth configure-docker $(GCP_REPO_SERVER)
 config-server:
 	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker $(GCP_REPO_SERVER)'
 
