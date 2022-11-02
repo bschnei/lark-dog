@@ -19,20 +19,20 @@ services:
       - apparmor:unconfined
     environment:
       PHOTOPRISM_ADMIN_PASSWORD:
-      PHOTOPRISM_DISABLE_SETTINGS: "true"
-      PHOTOPRISM_DISABLE_TENSORFLOW: "true"
       PHOTOPRISM_AUTH_MODE: "public"
       PHOTOPRISM_DATABASE_DRIVER: mysql
       PHOTOPRISM_DATABASE_SERVER: mariadb
       PHOTOPRISM_DATABASE_PASSWORD: photoprism
-      PHOTOPRISM_SITE_URL: "https://${DOMAIN}/"
-      PHOTOPRISM_SITE_DESCRIPTION: "It's a website. For a dog."
-      PHOTOPRISM_SITE_CAPTION: "Larky"
-      PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
-      PHOTOPRISM_SPONSOR: "true"
-      PHOTOPRISM_IMPRINT: "Photos Copyright Kelly G"
+      PHOTOPRISM_DISABLE_SETTINGS: "true"
+      PHOTOPRISM_DISABLE_TENSORFLOW: "true"
+      PHOTOPRISM_IMPRINT: "Content © 2021 Kelly G"
       PHOTOPRISM_IMPRINT_URI: "admin@lark.dog"
+      PHOTOPRISM_SITE_AUTHOR: "Kelly Gipson"
+      PHOTOPRISM_SITE_CAPTION: "Larky"
+      PHOTOPRISM_SITE_DESCRIPTION: "It's a website. For a dog."
       PHOTOPRISM_SITE_TITLE: "Larky"
+      PHOTOPRISM_SITE_URL: "https://${DOMAIN}/"
+      PHOTOPRISM_SPONSOR: "true"
     user: "1000:1000"
     networks:
       - frontend

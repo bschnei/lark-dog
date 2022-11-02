@@ -7,7 +7,7 @@ index 18561c0..847a7f4 100644
  // DisableWebDAV checks if the built-in WebDAV server should be disabled.
  func (c *Config) DisableWebDAV() bool {
 -	if c.Public() || c.ReadOnly() || c.Demo() {
-+	if c.Demo() {
++	if c.ReadOnly() || c.Demo() {
  		return true
  	}
  

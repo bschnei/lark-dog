@@ -50,6 +50,11 @@ ssh-cmd:
 		--zone=$(GCP_ZONE) \
 		--command="$(CMD)"
 
+delete-server:
+	gcloud compute instances delete $(GCP_INSTANCE_NAME) \
+		--project=$(GCP_PROJECT_ID) \
+		--zone=$(GCP_ZONE)
+
 ###
 
 build:
@@ -65,11 +70,6 @@ push:
 
 ###
 
-# this only needs to be run one time on a new instance
-# TODO: see if this can be migrated to cloud-init.conf
-# sudo -u ben gcloud --quiet auth configure-docker $(GCP_REPO_SERVER)
-config-server:
-	$(MAKE) ssh-cmd CMD='gcloud --quiet auth configure-docker $(GCP_REPO_SERVER)'
 
 update-config:
 	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~/$(GCP_PROJECT_ID) \

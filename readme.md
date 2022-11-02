@@ -2,7 +2,7 @@ This is a hobby project that allows me to keep track of how the open source [Pho
 
 I originally became interested in using it as a potential replacement for the closed source [Photos](https://www.synology.com/en-us/dsm/feature/photos) web application that I had been using for a few years. Photos was a huge improvement from Synology's older [PhotoStation](https://www.synology.com/en-us/dsm/feature/photo_station) application, despite having some quirks. In my opinion, it is the closest alternative (feature-wise) to something like Google Photos that exists in September 2022. You just have to be pretty dedicated to sytem and network admin to make it reachable (securely) outside of your own home.
 
-There are other open source photo management web application besides PhotoPrism. I poked at some of them but found them further behind feature- and looks-wise.
+There are other open source photo management web applications besides PhotoPrism. I poked at some of them but found them further behind feature- and looks-wise.
 
 [Multi-user support](https://github.com/photoprism/photoprism/issues/98) has been the missing feature preventing me from adopting it for personal use. So instead I've been seeing how it does as a public-facing website (i.e. no login required).
 
