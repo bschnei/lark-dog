@@ -1,4 +1,4 @@
-build
+photoprism/source
 *key.json
 .terraform
 terraform.tfstate.backup

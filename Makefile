@@ -1,5 +1,8 @@
 DOMAIN=lark.dog
 
+# specific upstream release tag to download, patch, and build
+PHOTOPRISM_RELEASE_TAG=221105-7a295cab4
+
 GCP_PROJECT_ID=lark-dog
 GCP_REGION=us-west1
 GCP_ZONE=$(GCP_REGION)-b
@@ -7,7 +10,7 @@ GCP_INSTANCE_NAME=lark-dog
 GCP_REPO_SERVER=$(GCP_REGION)-docker.pkg.dev
 GCP_ARTIFACT_REPO_ID=docker
 GCP_REPO_PATH=$(GCP_REPO_SERVER)/$(GCP_PROJECT_ID)/$(GCP_ARTIFACT_REPO_ID)
-
+GCP_PHOTOPRISM_TAG=$(GCP_REPO_PATH)/photoprism:$(PHOTOPRISM_RELEASE_TAG)
 
 define get-secret
 $(shell gcloud secrets versions access latest --secret=$(1) --project=$(GCP_PROJECT_ID))
@@ -15,6 +18,10 @@ endef
 
 define get-ipv4
 $(shell curl -s http://whatismyip.akamai.com/)
+endef
+
+define get-photoprism-latest-release-tag
+$(shell curl -sL https://api.github.com/repos/photoprism/photoprism/releases/latest | jq -r ".tag_name")
 endef
 
 terraform-init:
@@ -37,6 +44,27 @@ terraform-action:
 
 ###
 
+# notify if a newer release is available, download source and apply patch
+# NOTE: building a photoprism docker image from pure source code instead of a git repo fails (20221105)
+photoprism-source:
+    ifneq ($(call get-photoprism-latest-release-tag), $(PHOTOPRISM_RELEASE_TAG))
+		@echo "newer PhotoPrism release is available! ($(call get-photoprism-latest-release-tag))"
+    endif
+	@rm -rf photoprism/source
+	git clone --depth 1 --branch $(PHOTOPRISM_RELEASE_TAG) git@github.com:photoprism/photoprism.git photoprism/source
+	@patch -u photoprism/source/internal/config/config_features.go -i photoprism/webdav.patch
+
+# the docker-local-jammy make target uses ubuntu base which is consistent with upstream's dockerhub releases
+# the upstream Makefile docker-local target is still (20221105) using debian bookworm as base (which they deprecated)
+# if they update it, we can switch back to the more generic "docker-local" target
+photoprism-image:
+	$(MAKE) -C photoprism/source docker-local-jammy
+	docker tag photoprism/photoprism:local $(PHOTOPRISM_RELEASE_TAG)
+
+
+###
+
+
 SSH_STRING=ben@$(GCP_INSTANCE_NAME)
 
 ssh:
@@ -55,21 +83,7 @@ delete-server:
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE)
 
-###
-
-build:
-	rm -rf build
-	git clone --branch release --depth 1 git@github.com:photoprism/photoprism.git build
-	git apply --directory=build photoprism/webdav.patch
-	$(MAKE) -C build docker-local
-
-REMOTE_PHOTOPRISM_TAG=$(GCP_REPO_PATH)/photoprism:latest
-push:
-	docker tag photoprism/photoprism:local $(REMOTE_PHOTOPRISM_TAG)
-	docker push $(REMOTE_PHOTOPRISM_TAG)
-
-###
-
+deploy: update-config docker-pull docker-up docker-prune
 
 update-config:
 	gcloud compute scp docker-compose.yml $(GCP_INSTANCE_NAME):~/$(GCP_PROJECT_ID) \
@@ -82,29 +96,28 @@ update-config:
 		--project=$(GCP_PROJECT_ID) \
 		--zone=$(GCP_ZONE)
 
-deploy: update-config docker-pull docker-up docker-prune
-
 docker-pull:
+	docker push $(GCP_PHOTOPRISM_TAG)
 	$(MAKE) ssh-cmd CMD='\
 		cd $(GCP_PROJECT_ID) && \
 		DOMAIN=$(DOMAIN) \
-		GCP_REPO_PATH=$(GCP_REPO_PATH) \
-		sudo -E docker-compose pull'
+		GCP_PHOTOPRISM_TAG=$(GCP_PHOTOPRISM_TAG) \
+		sudo -E docker compose pull'
 
 docker-up:
 	@$(MAKE) ssh-cmd CMD='\
 		cd $(GCP_PROJECT_ID) && \
 		DOMAIN=$(DOMAIN) \
-		GCP_REPO_PATH=$(GCP_REPO_PATH) \
+		GCP_PHOTOPRISM_TAG=$(GCP_PHOTOPRISM_TAG) \
 		PHOTOPRISM_ADMIN_PASSWORD=$(call get-secret,photoprism_admin_password) \
-		sudo -E docker-compose up -d'
+		sudo -E docker compose up -d'
 
 docker-down:
 	$(MAKE) ssh-cmd CMD='\
 		cd $(GCP_PROJECT_ID) && \
 		DOMAIN=$(DOMAIN) \
-		GCP_REPO_PATH=$(GCP_REPO_PATH) \
-		sudo -E docker-compose down'
+		GCP_PHOTOPRISM_TAG=$(GCP_PHOTOPRISM_TAG) \
+		sudo -E docker compose down'
 
 docker-prune:
 	$(MAKE) ssh-cmd CMD='sudo docker system prune -a -f'

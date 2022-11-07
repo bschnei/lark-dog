@@ -1,8 +1,6 @@
-diff --git a/internal/config/config_features.go b/internal/config/config_features.go
-index 18561c0..847a7f4 100644
---- a/internal/config/config_features.go
-+++ b/internal/config/config_features.go
-@@ -4,7 +4,7 @@ var Sponsor = Env(EnvDemo, EnvSponsor, EnvTest)
+--- a/internal/config/config_features.go	2022-11-04 20:55:02.737722260 -0700
++++ b/internal/config/config_features.go	2022-11-02 17:17:48.790369086 -0700
+@@ -4,7 +4,7 @@
  
  // DisableWebDAV checks if the built-in WebDAV server should be disabled.
  func (c *Config) DisableWebDAV() bool {
