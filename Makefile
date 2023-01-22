@@ -1,7 +1,7 @@
 DOMAIN=lark.dog
 
 # specific upstream release tag to download, patch, and build
-PHOTOPRISM_RELEASE_TAG=221105-7a295cab4
+PHOTOPRISM_RELEASE_TAG=221118-e58fee0fb
 
 GCP_PROJECT_ID=lark-dog
 GCP_REGION=us-west1
@@ -55,12 +55,11 @@ photoprism-source:
 	@patch -u photoprism/source/internal/config/config_features.go -i photoprism/webdav.patch
 
 # the docker-local-jammy make target uses ubuntu base which is consistent with upstream's dockerhub releases
-# the upstream Makefile docker-local target is still (20221105) using debian bookworm as base (which they deprecated)
+# the upstream Makefile docker-local target is still (221118) using debian bookworm as base (which they deprecated)
 # if they update it, we can switch back to the more generic "docker-local" target
 photoprism-image:
 	$(MAKE) -C photoprism/source docker-local-jammy
-	docker tag photoprism/photoprism:local $(PHOTOPRISM_RELEASE_TAG)
-
+	docker tag photoprism/photoprism:local $(GCP_PHOTOPRISM_TAG)
 
 ###
 

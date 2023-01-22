@@ -56,12 +56,6 @@ resource "google_compute_firewall" "allow_web" {
   target_tags = ["allow-web"]
 }
 
-# base system image
-data "google_compute_image" "boot_image" {
-  family  = "ubuntu-minimal-2204-lts"
-  project = "ubuntu-os-cloud"
-}
-
 # persistent storage
 resource "google_compute_disk" "data" {
   name = "data"
@@ -75,7 +69,7 @@ resource "google_compute_instance" "web_server" {
   boot_disk {
     initialize_params {
       type  = "pd-balanced"
-      image = data.google_compute_image.boot_image.self_link
+      image = "ubuntu-minimal-2204-lts"
     }
   }
 
