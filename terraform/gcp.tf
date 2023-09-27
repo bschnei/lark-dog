@@ -12,6 +12,15 @@ provider "google" {
 resource "google_artifact_registry_repository" "docker" {
   repository_id = var.gcp_artifact_repo_id
   format        = "DOCKER"
+
+  lifecycle {
+    ignore_changes = [
+      # google did something stupid here
+      # ignore changes they made to this attribute on their side
+      maven_config,
+    ]
+  }
+
 }
 
 # static ipv4 address
