@@ -78,6 +78,7 @@ resource "google_compute_instance" "web_server" {
   boot_disk {
     initialize_params {
       type  = "pd-balanced"
+      size  = 15
       image = "ubuntu-minimal-2204-lts"
     }
   }
