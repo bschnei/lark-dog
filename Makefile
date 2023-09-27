@@ -26,7 +26,7 @@ endef
 
 terraform-init:
 	cd terraform && \
-		terraform init
+		terraform init -upgrade
 
 TF_ACTION?=plan
 terraform-action:
