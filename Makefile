@@ -1,7 +1,7 @@
 DOMAIN=lark.dog
 
 # specific upstream release tag to download, patch, and build
-PHOTOPRISM_RELEASE_TAG=231021-9abea5b55
+PHOTOPRISM_RELEASE_TAG=231128-f48ff16ef
 
 GCP_PROJECT_ID=lark-dog
 GCP_REGION=us-west1

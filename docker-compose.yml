@@ -43,7 +43,7 @@ services:
       - "~/data/photoprism/storage:/photoprism/storage"
 
   mariadb:
-    image: mariadb:11.1
+    image: mariadb:11
     container_name: mariadb
     restart: unless-stopped
     security_opt:
