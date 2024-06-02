@@ -1,7 +1,7 @@
 DOMAIN=lark.dog
 
 # specific upstream release tag to download, patch, and build
-PHOTOPRISM_RELEASE_TAG=231128-f48ff16ef
+PHOTOPRISM_RELEASE_TAG=240531-60b3a4628
 
 GCP_PROJECT_ID=lark-dog
 GCP_REGION=us-west1
@@ -54,6 +54,8 @@ photoprism-source:
 	git clone --depth 1 --branch $(PHOTOPRISM_RELEASE_TAG) git@github.com:photoprism/photoprism.git photoprism/source
 	@patch -u photoprism/source/internal/config/config_features.go -i photoprism/webdav.patch
 
+# NOTE: variables set with $(shell ) in the photoprism Makefile cause make to spin forever on make > 4.3
+# either build with make < 4.3 or adjust the Makefile. see: https://lists.gnu.org/archive/html/info-gnu/2022-10/msg00008.html
 photoprism-image:
 	$(MAKE) -C photoprism/source docker-local
 	docker tag photoprism/photoprism:local $(GCP_PHOTOPRISM_TAG)
